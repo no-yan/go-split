@@ -1,4 +1,14 @@
 
+## Daily Workflow
+
+```
+# Test main package
+go test
+# Test all packages
+go test ./...
+
+go build
+```
 
 ## Feat
 
