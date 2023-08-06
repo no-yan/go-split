@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/no-yan/go-split/core"
 )
 
 func main() {
-	fmt.Println("Hello")
+	result := core.Split("hello")
+	fmt.Println(result)
 }
