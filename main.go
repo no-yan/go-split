@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -10,6 +9,5 @@ import (
 
 func main() {
 	r := strings.NewReader("some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n")
-	result := core.Split(r, os.Stdout)
-	fmt.Println(result)
+	core.Split(r, os.Stdout)
 }
