@@ -26,6 +26,7 @@ func Test(t *testing.T) {
 	}{
 		{"", ""},
 		{"hello\n", "hello\n"},
+		{"Lacking EOF new line", "Lacking EOF new line\n"},
 		{"some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n", "some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n"},
 	}
 	for _, c := range cases {

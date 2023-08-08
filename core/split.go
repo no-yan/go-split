@@ -25,11 +25,17 @@ label:
 				if e != nil {
 					fmt.Fprintln(os.Stderr, "reading standard input:", e)
 				}
-				fmt.Fprint(w, scanner.Text())
+
+				// EOF
+				txt := scanner.Text()
+				fmt.Fprint(w, txt)
+				if len(txt) != 0 {
+					fmt.Fprint(w, "/n")
+				}
 				break label
 			}
 
-			fmt.Fprint(w, scanner.Text(), "\n")
+			fmt.Fprintln(w, scanner.Text())
 			next = scanner.Scan()
 		}
 
