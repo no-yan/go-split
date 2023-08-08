@@ -1,6 +1,10 @@
 package core
 
-import "testing"
+import (
+	"os"
+	"strings"
+	"testing"
+)
 
 var empty []string
 
@@ -25,7 +29,8 @@ func Test(t *testing.T) {
 		{"hello", []string{}},
 	}
 	for _, c := range cases {
-		got := Split(c.in)
+		r := strings.NewReader(c.in)
+		got := Split(r, os.Stdout)
 		if !Equal(got, c.want) {
 			t.Errorf("Split(%q) == %q, want %q", c.in, got, c.want)
 		}
