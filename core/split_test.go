@@ -1,8 +1,7 @@
 package core
 
 import (
-	"os"
-	"strings"
+	"bytes"
 	"testing"
 )
 
@@ -23,15 +22,17 @@ func Equal(a, b []string) bool {
 func Test(t *testing.T) {
 	cases := []struct {
 		in   string
-		want []string
+		want string
 	}{
-		{"", []string{}},
-		{"hello", []string{}},
+		{"", ""},
+		{"hello", "hello"},
 	}
 	for _, c := range cases {
-		r := strings.NewReader(c.in)
-		got := Split(r, os.Stdout)
-		if !Equal(got, c.want) {
+		r := bytes.NewReader([]byte(c.in))
+		out := &bytes.Buffer{}
+		Split(r, out)
+
+		if got := out.String(); got != c.want {
 			t.Errorf("Split(%q) == %q, want %q", c.in, got, c.want)
 		}
 	}
