@@ -18,24 +18,20 @@ func Split(r io.Reader, w io.Writer) []string {
 	scanner := bufio.NewScanner(r)
 	// data := make([]byte, 5000)
 
-	readMore := true
-	for readMore {
+	for next := scanner.Scan(); next; {
 		w := bufio.NewWriter(w)
-	exit_loop:
 		for i := 0; i < lineLim; i++ {
-			next := scanner.Scan()
+
 			fmt.Fprint(w, scanner.Text(), "\n")
 			// EOFでもresultが存在してる
 			if next == false {
-				// 複数のエラーケースはどう処理する？
-				switch e := scanner.Err(); e {
-				case nil:
-					readMore = false
-					break exit_loop
-				default:
+				if e := scanner.Err(); e != nil {
 					fmt.Fprintln(os.Stderr, "reading standard input:", e)
+					panic(e)
 				}
+				break
 			}
+			next = scanner.Scan()
 		}
 		w.Flush()
 	}
