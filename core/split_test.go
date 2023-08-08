@@ -25,7 +25,8 @@ func Test(t *testing.T) {
 		want string
 	}{
 		{"", ""},
-		{"hello", "hello"},
+		{"hello\n", "hello\n"},
+		{"some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n", "some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n"},
 	}
 	for _, c := range cases {
 		r := bytes.NewReader([]byte(c.in))
