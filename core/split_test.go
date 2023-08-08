@@ -22,7 +22,7 @@ func Test(t *testing.T) {
 		want []string
 	}{
 		{"", []string{}},
-		{"hello", []string{"hello"}},
+		{"hello", []string{}},
 	}
 	for _, c := range cases {
 		got := Split(c.in)

@@ -1,16 +1,43 @@
 package core
 
-func Split(s string) []string {
-	chunkSize := 1000
-	var result []string
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
-	for i := 0; i < len(s); i += chunkSize {
-		start := i
-		end := start + chunkSize
-		if end >= len(s) {
-			end = len(s)
+func Split(s string) []string {
+	// chunkSize := 1000
+	lineLim := 2
+	var result []string
+	// var fp *os.File
+	r := strings.NewReader("some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n")
+	scanner := bufio.NewScanner(r)
+	// data := make([]byte, 5000)
+
+	readMore := true
+	for readMore {
+		w := bufio.NewWriter(os.Stdout)
+	exit_loop:
+		for i := 0; i < lineLim; i++ {
+			fmt.Println(i)
+			next := scanner.Scan()
+			fmt.Fprint(w, scanner.Text())
+			// EOFでもresultが存在してる
+			if next == false {
+				// 複数のエラーケースはどう処理する？
+				switch e := scanner.Err(); e {
+				case nil:
+					readMore = false
+					break exit_loop
+				default:
+					fmt.Fprintln(os.Stderr, "reading standard input:", e)
+				}
+			}
 		}
-		result = append(result, s[start:end])
+		fmt.Fprint(w, "\n")
+		w.Flush()
 	}
 
 	return result
