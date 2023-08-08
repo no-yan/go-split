@@ -11,7 +11,7 @@ go build
 ```
 
 ## Feat
-
+- [ ] 複数ファイルに分割
 - [ ] 途中で失敗した場合、ファイルが復元されている？
 - [ ] prefixの数よりoutputファイル数が多い > split: too many files
 - [ ] inputファイルが読み込めない
@@ -26,7 +26,7 @@ go build
   - [ ] inputファイルと同名
   - [ ] すでにファイルが存在する
 - [ ] inputの
-  - [ ] 最終行の改行がない
+  - [x] 最終行の改行がない
 - [ ] outputの
   - [ ] 改行がwindowsでは /r/n になっている
 ## Note
