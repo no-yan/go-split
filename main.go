@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/no-yan/go-split/core"
@@ -15,5 +14,5 @@ func main() {
 	}
 	defer f.Close()
 
-	core.Split(f, func() io.Writer { return os.Stdout })
+	core.Split(f, core.GenerateNextWriter())
 }
