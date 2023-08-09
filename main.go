@@ -1,13 +1,19 @@
 package main
 
 import (
+	"fmt"
+	"io"
 	"os"
-	"strings"
 
 	"github.com/no-yan/go-split/core"
 )
 
 func main() {
-	r := strings.NewReader("some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n")
-	core.Split(r, os.Stdout)
+	f, err := os.Open("aa.txt")
+	if err != nil {
+		fmt.Println("cannot open the file")
+	}
+	defer f.Close()
+
+	core.Split(f, func() io.Writer { return os.Stdout })
 }
