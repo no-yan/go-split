@@ -13,5 +13,4 @@ func Test(t *testing.T) {
 
 	// }
 	main()
-	// Output: hello
 }
