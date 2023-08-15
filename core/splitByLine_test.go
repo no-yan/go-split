@@ -3,6 +3,7 @@ package core
 import (
 	"bytes"
 	"io"
+	"reflect"
 	"testing"
 )
 
@@ -10,42 +11,60 @@ func TestSplitByLine(t *testing.T) {
 	cases := []struct {
 		name  string
 		in    string
-		want  string
+		want  []string
 		limit int
 	}{
 		{
 			name:  "empty input",
 			in:    "",
-			want:  "",
+			want:  []string{},
 			limit: 1,
 		},
 		{
 			name:  "single line",
 			in:    "hello\n",
-			want:  "hello\n",
+			want:  []string{"hello\n"},
 			limit: 1,
 		},
 		{
 			name:  "no trailing newline",
 			in:    "Lacking EOF new line",
-			want:  "Lacking EOF new line\n",
+			want:  []string{"Lacking EOF new line\n"},
 			limit: 1,
 		},
 		{
+			name: "multiple lines",
+			in:   "some io.Reader stream to be read\nsome io.Reader stream to be read\n",
+			// 本当は gnu split と挙動を合わせたい
+			// want:  []string{"some io.Reader stream to be read\nsome io.Reader stream to be read\n", ""},
+			want:  []string{"some io.Reader stream to be read\nsome io.Reader stream to be read\n"},
+			limit: 2,
+		},
+		{
 			name:  "multiple lines",
-			in:    "some io.Reader stream to be read\nsome io.Reader stream to be read\n",
-			want:  "some io.Reader stream to be read\nsome io.Reader stream to be read\n",
+			in:    "a\nb\nc\nd\ne\n",
+			want:  []string{"a\nb\n", "c\nd\n", "e\n"},
 			limit: 2,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			r := bytes.NewReader([]byte(c.in))
-			out := &bytes.Buffer{}
-			SplitByLine(r, func() io.Writer { return out }, c.limit)
+			var buffers []*bytes.Buffer
+			writerFunc := func() io.Writer {
+				buf := &bytes.Buffer{}
+				buffers = append(buffers, buf)
+				return buf
+			}
+			SplitByLine(r, writerFunc, c.limit)
 
-			if got := out.String(); got != c.want {
-				t.Errorf("SplitByLine(%q)\n got: %q\n want: %q\n", c.in, got, c.want)
+			got := make([]string, len(buffers))
+			for i, buf := range buffers {
+				got[i] = buf.String()
+			}
+
+			if !reflect.DeepEqual(got, c.want) {
+				t.Errorf("SplitByLine(%q)\n expected: %q\n got: %q", c.in, c.want, got)
 			}
 		})
 	}
