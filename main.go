@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -25,19 +26,25 @@ type Res struct {
 }
 
 func main() {
-
 	flag.Parse()
 	path := flag.Arg(0)
 
 	var file io.Reader
 
 	// ファイルが存在しない場合、標準入力から受け取る
-	if path == "" {
-		f := bufio.NewReader(os.Stdin)
-		file = f
-		// 標準入力が存在しないかこの段階で判定できる？
-		// エラーメッセージが変わりそう
-	} else {
+	switch path {
+	case "", "-":
+
+		file := bufio.NewReader(os.Stdin)
+		defer os.Stdin.Close()
+
+		// 標準入力が空であれば、ミスの可能性が高い
+		_, err := file.Peek(1)
+		if err != nil {
+			fmt.Print("Stdin is empty. Are you specifying the command in the wrong way?")
+			log.Fatal(err)
+		}
+	default:
 		// TODO: Openで特殊なpathを指定された時の挙動を調べる(普通にやると開かないpathがあるか)
 		f, err := os.Open(path)
 		if err != nil {
@@ -51,5 +58,5 @@ func main() {
 
 	// Res{lineCount, chunkCount, byteCount}
 
-	core.Split(file, core.GenerateNextWriter())
+	core.SplitBySize(file, core.GenerateNextWriter(), 5)
 }
