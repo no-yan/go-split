@@ -3,55 +3,86 @@ package core
 import (
 	"bufio"
 	"bytes"
-	"fmt"
+	"io"
+	"reflect"
 	"testing"
 )
 
-// func TestBySize(t *testing.T) {
-// 	cases := []struct {
-// 		in   string
-// 		want string
-// 	}{
-// 		{"", ""},
-// 		{"hello\n", "hello\n\n"},
-// 		{"Lacking EOF new line", "Lacki\nng EO\nF new\n line\n"},
-// 		{"some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n", "some \nio.Re\nader \nstrea\nm to \nbe re\nad\nso\nme io\n.Read\ner st\nream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n"},
-// 	}
-// 	for _, c := range cases {
-// 		r := bytes.NewReader([]byte(c.in))
-// 		out := &bytes.Buffer{}
-// 		SplitBySize(r, func() io.Writer { return out }, 5)
-
-// 		if got := out.String(); got != c.want {
-// 			t.Errorf("Split(%q) == %q, want %q", c.in, got, c.want)
-// 		}
-// 	}
-// }
-
-func TestSplitFunction(t *testing.T) {
+func TestSplitBySize(t *testing.T) {
 	cases := []struct {
+		name string
 		in   string
-		want string
+		want []string
+		size int
 	}{
-		{"", ""},
-		{"hello\n", "hello\n\n\n"},
-		{"Lacking EOF new line", "Lacki\nng EO\nF new\n line\n"},
-		{"some io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\nsome io.Reader stream to be read\n", "some \nio.Re\nader \nstrea\nm to \nbe re\nad\nso\nme io\n.Read\ner st\nream \nto be\n read\n\nsome\n io.R\neader\n stre\nam to\n be r\nead\ns\nome i\no.Rea\nder s\ntream\n to b\ne rea\nd\n\n"},
+		{
+			name: "empty input",
+			in:   "",
+			want: []string{},
+			size: 1,
+		},
+		{
+			name: "single line",
+			in:   "hello\n",
+			want: []string{"h", "e", "l", "l", "o", "\n"},
+			size: 1,
+		},
+		{
+			name: "10 rune",
+			in:   "0123456789",
+			want: []string{"012", "345", "678", "9"},
+			size: 3,
+		},
 	}
 	for _, c := range cases {
-		r := bytes.NewReader([]byte(c.in))
-		out := &bytes.Buffer{}
-		scanner := bufio.NewScanner(r)
-		scanner.Split(split(5))
-
-		for scanner.Scan() {
-			txt := scanner.Text()
-			if len(txt) > 0 {
-				fmt.Fprintln(out, txt)
+		t.Run(c.name, func(t *testing.T) {
+			r := bytes.NewReader([]byte(c.in))
+			var buffers []*bytes.Buffer
+			writerFunc := func() io.Writer {
+				buf := &bytes.Buffer{}
+				buffers = append(buffers, buf)
+				return buf
 			}
-		}
-		if got := out.String(); got != c.want {
-			t.Errorf("Split(%q) == %q, want %q", c.in, got, c.want)
-		}
+			SplitBySize(r, writerFunc, c.size)
+
+			got := make([]string, len(buffers))
+			for i, buf := range buffers {
+				got[i] = buf.String()
+			}
+
+			if !reflect.DeepEqual(got, c.want) {
+				t.Errorf("SplitBySize(%q)\n expected: %q\n got: %q", c.in, c.want, got)
+			}
+		})
+	}
+}
+
+func TestCustomSplitFunc(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want []string
+		size int
+	}{
+		{name: "empty input", in: "", want: []string{}, size: 5},
+		{name: "simple input", in: "hello\n", want: []string{"hello", "\n"}, size: 5},
+		{name: "no trailing newline", in: "Lacking EOF new line", want: []string{"Lacki", "ng EO", "F new", " line"}, size: 5},
+		{name: "multiple lines", in: "123456789\n123456789\n123456789\n123456789\n123456789\n",
+			want: []string{"12345", "6789\n", "12345", "6789\n", "12345", "6789\n", "12345", "6789\n", "12345", "6789\n"}, size: 5},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			r := bytes.NewReader([]byte(c.in))
+			got := make([]string, 0)
+			scanner := bufio.NewScanner(r)
+			scanner.Split(split(c.size))
+
+			for scanner.Scan() {
+				got = append(got, scanner.Text())
+			}
+			if !reflect.DeepEqual(got, c.want) {
+				t.Errorf("SplitBySize(%q)\n expected: %q\n got: %q", c.in, c.want, got)
+			}
+		})
 	}
 }
