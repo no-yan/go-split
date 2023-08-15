@@ -46,6 +46,12 @@ func TestSplitByLine(t *testing.T) {
 			want:  []string{"a\nb\n", "c\nd\n", "e\n"},
 			limit: 2,
 		},
+		{
+			name:  "empty lines",
+			in:    "\n\n\n\n\n\n\n\n\n\n",
+			want:  []string{"\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n"},
+			limit: 1,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
