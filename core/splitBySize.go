@@ -21,7 +21,6 @@ func split(size int) bufio.SplitFunc {
 	}
 }
 
-// TODO: intでいい？
 func SplitBySize(r io.Reader, w func() io.Writer, size int) error {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(split((size)))
@@ -31,7 +30,6 @@ func SplitBySize(r io.Reader, w func() io.Writer, size int) error {
 
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
-			// TODO:
 			return err
 		}
 		wInstance := w()
