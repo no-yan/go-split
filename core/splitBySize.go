@@ -22,7 +22,7 @@ func split(size int) bufio.SplitFunc {
 }
 
 // TODO: intでいい？
-func SplitBySize(r io.Reader, w NewWriterFunc, size int) {
+func SplitBySize(r io.Reader, w NewWriterFunc, size int) error {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(split((size)))
 
@@ -30,17 +30,19 @@ func SplitBySize(r io.Reader, w NewWriterFunc, size int) {
 	// https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go
 
 	for scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			// TODO:
+			return err
+		}
 		bw := bufio.NewWriter(w())
-		defer bw.Flush()
 
 		txt := scanner.Text()
 		if len(txt) > 0 {
 			fmt.Fprint(bw, txt)
 		}
 
-		if err := scanner.Err(); err != nil {
-			// TODO:
-			break
-		}
+		bw.Flush()
 	}
+
+	return nil
 }
