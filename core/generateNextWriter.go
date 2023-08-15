@@ -21,9 +21,10 @@ func nextAlphabet(prev string) string {
 // ジェネレーターのネストは可読性が落ちそう
 func fileGenerator() func() (*os.File, error) {
 	fileName := ""
+	prefix := "x"
 	return func() (*os.File, error) {
 		fileName = nextAlphabet(fileName)
-		return os.Create(fileName)
+		return os.Create(prefix + fileName)
 	}
 }
 
