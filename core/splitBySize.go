@@ -22,7 +22,7 @@ func split(size int) bufio.SplitFunc {
 }
 
 // TODO: intでいい？
-func SplitBySize(r io.Reader, w NewWriterFunc, size int) error {
+func SplitBySize(r io.Reader, w func() io.Writer, size int) error {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(split((size)))
 
@@ -34,6 +34,7 @@ func SplitBySize(r io.Reader, w NewWriterFunc, size int) error {
 			// TODO:
 			return err
 		}
+		wInstance := w()
 		bw := bufio.NewWriter(w())
 
 		txt := scanner.Text()
@@ -42,6 +43,11 @@ func SplitBySize(r io.Reader, w NewWriterFunc, size int) error {
 		}
 
 		bw.Flush()
+
+		// Close the writer instance if it's a WriteCloser
+		if closer, ok := wInstance.(io.WriteCloser); ok {
+			closer.Close()
+		}
 	}
 
 	return nil
