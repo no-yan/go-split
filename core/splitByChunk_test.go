@@ -32,6 +32,7 @@ func TestSplitByChunk(t *testing.T) {
 			want:  []string{"012", "345", "6789"},
 			chunk: 3,
 		},
+		// TODO: 巨大な入力
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -42,7 +43,7 @@ func TestSplitByChunk(t *testing.T) {
 				buffers = append(buffers, buf)
 				return buf
 			}
-			SplitByChunk(r, writerFunc, c.chunk)
+			SplitByChunk(r, writerFunc, c.chunk, len(c.in))
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {
