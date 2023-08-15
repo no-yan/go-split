@@ -26,11 +26,12 @@ func main() {
 	// ファイルが存在しない場合、標準入力から受け取る
 	switch path {
 	case "", "-":
-		file := bufio.NewReader(os.Stdin)
+		reader := bufio.NewReader(os.Stdin)
+		file = reader
 		defer os.Stdin.Close()
 
 		// 標準入力が空であれば、ミスの可能性が高い
-		_, err := file.Peek(1)
+		_, err := reader.Peek(1)
 		if err != nil {
 			fmt.Print("Stdin is empty. Are you specifying the command in the wrong way?")
 			log.Fatal(err)
@@ -44,5 +45,25 @@ func main() {
 		file = f
 	}
 
-	core.SplitBySize(file, core.GenerateNextWriter(), 5)
+	splitBy := "line"
+	switch splitBy {
+	case "line":
+		if file == nil {
+			fmt.Println("file is nil")
+		}
+		err := core.SplitByLine(file, core.GenerateNextWriter(), 1000)
+		if err != nil {
+			// TODO
+		}
+	case "chunk":
+		err := core.SplitToChunk(file, core.GenerateNextWriter(), 5, 3)
+		if err != nil {
+			// TODO
+		}
+	case "byte":
+		err := core.SplitByByte(file, core.GenerateNextWriter(), 5)
+		if err != nil {
+			// TODO
+		}
+	}
 }
