@@ -43,7 +43,7 @@ func TestSplitByChunk(t *testing.T) {
 				buffers = append(buffers, buf)
 				return buf
 			}
-			SplitByChunk(r, writerFunc, c.chunk, len(c.in))
+			SplitToChunk(r, writerFunc, c.chunk, len(c.in))
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {

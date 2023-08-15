@@ -43,7 +43,7 @@ func TestSplitBySize(t *testing.T) {
 				buffers = append(buffers, buf)
 				return buf
 			}
-			SplitBySize(r, writerFunc, c.size)
+			SplitByByte(r, writerFunc, c.size)
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {
