@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestSplitBySize(t *testing.T) {
+func TestSplitByByte(t *testing.T) {
 	cases := []struct {
 		name string
 		in   string
