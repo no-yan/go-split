@@ -1,3 +1,3 @@
 module github.com/no-yan/go-split
 
-go 1.20
+go 1.21
