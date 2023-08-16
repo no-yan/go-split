@@ -21,7 +21,7 @@ func split(size int) bufio.SplitFunc {
 	}
 }
 
-func SplitByByte(r io.Reader, w func() io.Writer, size int) error {
+func SplitByByte(r io.Reader, w NewWriterFunc, size int) error {
 	scanner := bufio.NewScanner(r)
 	scanner.Split(split((size)))
 

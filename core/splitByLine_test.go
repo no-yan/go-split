@@ -57,10 +57,12 @@ func TestSplitByLine(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			r := bytes.NewReader([]byte(c.in))
 			var buffers []*bytes.Buffer
-			writerFunc := func() io.Writer {
+			writerFunc := func() io.WriteCloser {
 				buf := &bytes.Buffer{}
 				buffers = append(buffers, buf)
-				return buf
+				return &BufferWriteCloser{
+					Buffer: buf,
+				}
 			}
 			SplitByLine(r, writerFunc, c.limit)
 

@@ -8,7 +8,7 @@ import (
 
 // いったんNのパターンのみ実装
 // ラウンドロビン分割、標準出力、レコード分割はサポートしないなどはやらない
-func SplitToChunk(r io.Reader, w func() io.Writer, chunk int, fileSize int) error {
+func SplitToChunk(r io.Reader, w NewWriterFunc, chunk int, fileSize int) error {
 	// FIXME: pathはここより上で取得する
 	// fileInfo, err := os.Stat("/Users/noyan/tmp/sample.txt")
 	// if err != nil {

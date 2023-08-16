@@ -28,9 +28,9 @@ func fileGenerator() func() (*os.File, error) {
 	}
 }
 
-func GenerateNextWriter() func() io.Writer {
+func GenerateNextWriter() func() io.WriteCloser {
 	createFile := fileGenerator()
-	generator := func() io.Writer {
+	generator := func() io.WriteCloser {
 		file, err := createFile()
 		if err != nil {
 			panic(err)

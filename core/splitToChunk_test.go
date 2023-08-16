@@ -38,10 +38,12 @@ func TestSplitByChunk(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			r := bytes.NewReader([]byte(c.in))
 			var buffers []*bytes.Buffer
-			writerFunc := func() io.Writer {
+			writerFunc := func() io.WriteCloser {
 				buf := &bytes.Buffer{}
 				buffers = append(buffers, buf)
-				return buf
+				return &BufferWriteCloser{
+					Buffer: buf,
+				}
 			}
 			SplitToChunk(r, writerFunc, c.chunk, len(c.in))
 
@@ -55,4 +57,14 @@ func TestSplitByChunk(t *testing.T) {
 			}
 		})
 	}
+}
+
+type BufferWriteCloser struct {
+	*bytes.Buffer
+}
+
+func (bwc *BufferWriteCloser) Close() error {
+	// bytes.Buffer には実際にクローズする必要はありませんが、
+	// 必要に応じて任意の終了処理をここに書くことができます。
+	return nil
 }

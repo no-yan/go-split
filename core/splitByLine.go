@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-type NewWriterFunc func() io.Writer
+type NewWriterFunc func() io.WriteCloser
 
 func SplitByLine(r io.Reader, newWriter NewWriterFunc, n int) error {
 	scanner := bufio.NewScanner(r)

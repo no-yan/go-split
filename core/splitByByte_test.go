@@ -28,6 +28,12 @@ func TestSplitBySize(t *testing.T) {
 			size: 1,
 		},
 		{
+			name: "single line(devided by 2 bytes)",
+			in:   "aa\n",
+			want: []string{"aa", "\n"},
+			size: 2,
+		},
+		{
 			name: "10 rune",
 			in:   "0123456789",
 			want: []string{"012", "345", "678", "9"},
@@ -38,10 +44,12 @@ func TestSplitBySize(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			r := bytes.NewReader([]byte(c.in))
 			var buffers []*bytes.Buffer
-			writerFunc := func() io.Writer {
+			writerFunc := func() io.WriteCloser {
 				buf := &bytes.Buffer{}
 				buffers = append(buffers, buf)
-				return buf
+				return &BufferWriteCloser{
+					Buffer: buf,
+				}
 			}
 			SplitByByte(r, writerFunc, c.size)
 
