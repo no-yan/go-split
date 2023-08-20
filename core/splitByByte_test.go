@@ -28,7 +28,7 @@ func TestSplitByByte(t *testing.T) {
 			size: 1,
 		},
 		{
-			name: "single line(devided by 2 bytes)",
+			name: "single line(divided by 2 bytes)",
 			in:   "aa\n",
 			want: []string{"aa", "\n"},
 			size: 2,
@@ -60,6 +60,73 @@ func TestSplitByByte(t *testing.T) {
 
 			if !reflect.DeepEqual(got, c.want) {
 				t.Errorf("SplitBySize(%q)\n expected: %q\n got: %q", c.in, c.want, got)
+			}
+		})
+	}
+}
+
+func TestSplitByByteLargeInput(t *testing.T) {
+	if testing.Short() {
+		t.SkipNow()
+	}
+	cases := []struct {
+		name string
+		in   int
+		want []string
+		size int
+	}{
+		{
+			name: "10MB / 512",
+			in:   10 * 1024 * 1024,
+			want: []string{},
+			size: 512,
+		},
+		{
+			name: "10MB / 1000",
+			in:   10 * 1024 * 1024,
+			want: []string{},
+			size: 1000,
+		},
+		{
+			name: "1 GB / 512",
+			in:   1 * 1024 * 1024 * 1024,
+			want: []string{},
+			size: 512,
+		},
+		{
+			name: "10GB / 1MB",
+			in:   1 * 1024 * 1024 * 1024,
+			want: []string{},
+			size: 10 * 1024,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			largeInput := bytes.Repeat([]byte{'a'}, c.in)
+			// (c.size - 1) / c.size は 0
+			// c.size / c.size とすると余りの有無が考慮できない
+			expectedSplits := (c.in + c.size - 1) / c.size
+
+			r := bytes.NewReader(largeInput)
+			var buffers []*bytes.Buffer
+			writerFunc := func() io.WriteCloser {
+				buf := &bytes.Buffer{}
+				buffers = append(buffers, buf)
+				return &BufferWriteCloser{
+					Buffer: buf,
+				}
+			}
+
+			SplitByByte(r, writerFunc, c.size)
+
+			if len(buffers) != expectedSplits {
+				t.Errorf("Expected %d splits, but got %d", expectedSplits, len(buffers))
+			}
+
+			for _, buf := range buffers {
+				if buf.Len() != c.size && buf.Len() != c.in%c.size { // 最後のブロックは小さい可能性がある
+					t.Errorf("Expected buffer of size %d or %d, but got %d", c.size, c.in%c.size, buf.Len())
+				}
 			}
 		})
 	}

@@ -12,6 +12,7 @@ func SplitByLine(r io.Reader, newWriter NewWriterFunc, n int) error {
 	scanner := bufio.NewScanner(r)
 
 	// FIXME: bufioは行が65536文字を超えるとエラーが発生する。
+	// fileInfoでファイルサイズを見て、必要そうであれば拡大する？
 	// https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go
 	// buf := make([]byte, 0, 64*1024)
 	// scanner.Buffer(buf, 10*64*1024) // 例: 10倍のサイズに設定

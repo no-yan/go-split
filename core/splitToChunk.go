@@ -6,25 +6,19 @@ import (
 	"io"
 )
 
-// いったんNのパターンのみ実装
-// ラウンドロビン分割、標準出力、レコード分割はサポートしないなどはやらない
 func SplitToChunk(r io.Reader, w NewWriterFunc, chunk int, fileSize int) error {
-	// FIXME: pathはここより上で取得する
-	// fileInfo, err := os.Stat("/Users/noyan/tmp/sample.txt")
-	// if err != nil {
-	// 	log.Fatalf("failed getting information of file: %s", err)
-	// }
-
 	// 64-bit OSで int は 64 bits wide なので、int と int64 はお互い問題なくキャストできる
 	// 32-bit OSは今回考慮しない
 	chunkBytes := fileSize / chunk
 
-	// MB単位で読み込む場合、エラーを出さずにSplitできるかわからないので試す
 	scanner := bufio.NewScanner(r)
 	scanner.Split(split(chunkBytes))
+	// MB, GB単位で読み込む場合、 バッファサイズを上げる
+	if fileSize/chunk >= 65536 {
+		buf := make([]byte, fileSize/chunk)
+		scanner.Buffer(buf, fileSize/chunk)
+	}
 
-	// FIXME: bufioは行が65536文字を超えるとエラーが発生する
-	// https://stackoverflow.com/questions/8757389/reading-a-file-line-by-line-in-go
 	count := 0
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
@@ -43,7 +37,7 @@ func SplitToChunk(r io.Reader, w NewWriterFunc, chunk int, fileSize int) error {
 		}
 	}
 
-	// Write remaining bytes to a single file
+	// 入力の残りがあれば、1つのファイルに書き込む
 	var lastBw *bufio.Writer
 	for scanner.Scan() {
 		if lastBw == nil {

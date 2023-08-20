@@ -17,19 +17,19 @@ func nextAlphabet(prev string) string {
 	return headRunes + string(trailingRune+1)
 }
 
-// ファイル名生成の責務ををGenerateNextWriterから分離したが、ジェネレーター使いすぎているかもしれない
-// ジェネレーターのネストは可読性が落ちそう
-func fileGenerator() func() (*os.File, error) {
+func fileGenerator(prefix string) func() (*os.File, error) {
 	fileName := ""
-	prefix := "x"
 	return func() (*os.File, error) {
 		fileName = nextAlphabet(fileName)
 		return os.Create(prefix + fileName)
 	}
 }
 
-func GenerateNextWriter() func() io.WriteCloser {
-	createFile := fileGenerator()
+func GenerateNextWriter(prefix string) func() io.WriteCloser {
+	if prefix == "" {
+		prefix = "x"
+	}
+	createFile := fileGenerator(prefix)
 	generator := func() io.WriteCloser {
 		file, err := createFile()
 		if err != nil {

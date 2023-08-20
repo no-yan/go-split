@@ -7,7 +7,6 @@ func TestNextAlphabet(t *testing.T) {
 		in, want string
 	}{
 		{"", "a"}, {"a", "b"}, {"z", "aa"}, {"zz", "aaa"}, {"daz", "dba"},
-		// {"zz zzz", ""},
 	}
 	for _, c := range cases {
 		got := nextAlphabet(c.in)
