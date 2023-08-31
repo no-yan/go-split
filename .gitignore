@@ -21,3 +21,6 @@
 go.work
 
 go-split
+
+# ローカルデバッグ用
+aa.txt
