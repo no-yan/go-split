@@ -64,7 +64,9 @@ func TestSplitByLine(t *testing.T) {
 					Buffer: buf,
 				}
 			}
-			SplitByLine(r, writerFunc, c.limit)
+			if err := SplitByLine(r, writerFunc, c.limit); err != nil {
+				t.Errorf("SplitByLine(%q)\n expected: %q\n got: %q", c.in, c.want, err)
+			}
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {

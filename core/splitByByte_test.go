@@ -51,7 +51,9 @@ func TestSplitByByte(t *testing.T) {
 					Buffer: buf,
 				}
 			}
-			SplitByByte(r, writerFunc, c.size)
+			if err := SplitByByte(r, writerFunc, c.size); err != nil {
+				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, err)
+			}
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {
@@ -59,7 +61,7 @@ func TestSplitByByte(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(got, c.want) {
-				t.Errorf("SplitBySize(%q)\n expected: %q\n got: %q", c.in, c.want, got)
+				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, got)
 			}
 		})
 	}
@@ -117,7 +119,9 @@ func TestSplitByByteLargeInput(t *testing.T) {
 				}
 			}
 
-			SplitByByte(r, writerFunc, c.size)
+			if err := SplitByByte(r, writerFunc, c.size); err != nil {
+				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, err)
+			}
 
 			if len(buffers) != expectedSplits {
 				t.Errorf("Expected %d splits, but got %d", expectedSplits, len(buffers))
@@ -156,7 +160,7 @@ func TestCustomSplitFunc(t *testing.T) {
 				got = append(got, scanner.Text())
 			}
 			if !reflect.DeepEqual(got, c.want) {
-				t.Errorf("SplitBySize(%q)\n expected: %q\n got: %q", c.in, c.want, got)
+				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, got)
 			}
 		})
 	}

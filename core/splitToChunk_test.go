@@ -46,7 +46,9 @@ func TestSplitByChunk(t *testing.T) {
 					Buffer: buf,
 				}
 			}
-			SplitToChunk(r, writerFunc, c.chunk, len(c.in))
+			if err := SplitToChunk(r, writerFunc, c.chunk, len(c.in)); err != nil {
+				t.Errorf("SplitToChunk(%q)\n expected: %q\n got: %q", c.in, c.want, err)
+			}
 
 			got := make([]string, len(buffers))
 			for i, buf := range buffers {
