@@ -25,49 +25,12 @@ func main() {
 		log.Fatalf("CLI error: %s", err)
 	}
 	path := flag.Arg(0)
+	file, fileSize, err := getReader(path)
+	if err != nil {
+		log.Fatalf("Error: %s", err)
+	}
+
 	prefix := flag.Arg(1)
-
-	var file io.Reader
-	var fileSize int64
-
-	switch path {
-	// If file is a single dash (‘-’) or absent, split reads from the standard input.
-	case "", "-":
-		f := os.Stdin
-		defer os.Stdin.Close()
-
-		fi, err := f.Stat()
-		if err != nil {
-			fmt.Println("file.Stat()", err)
-		}
-		// 標準入力のサイズが0であれば、コマンドの入力ミスの可能性が高い
-		// https://stackoverflow.com/a/22564526
-
-		file = f
-		fileSize = fi.Size()
-		if fileSize == 0 {
-			log.Fatalln("Stdin is empty. Are you specifying the command in the wrong way?")
-			flag.Usage()
-		}
-
-	default:
-		f, err := os.Open(path)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer f.Close()
-		fi, err := f.Stat()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		file = f
-		fileSize = fi.Size()
-	}
-
-	if file == nil {
-		log.Fatal("File is nil")
-	}
 
 	switch {
 	case *chunkCount != 0:
@@ -99,4 +62,49 @@ func validateFlags(line, chunk, byte int) error {
 		return errors.New("A negative value was entered. Please input a positive integer only.")
 	}
 	return nil
+}
+
+func getReader(path string) (io.Reader, int64, error) {
+
+	var file io.Reader
+	// io.Readerからファイルサイズを取得できないため、この関数で同時に返却する
+	var fileSize int64
+
+	switch path {
+	// If file is a single dash (‘-’) or absent, split reads from the standard input.
+	case "", "-":
+		f := os.Stdin
+		defer os.Stdin.Close()
+
+		fi, err := f.Stat()
+		if err != nil {
+			return nil, 0, err
+		}
+
+		file = f
+		fileSize = fi.Size()
+
+		if fileSize == 0 {
+			// 標準入力のサイズが0であれば、コマンドの入力ミスの可能性が高い
+			// https://stackoverflow.com/a/22564526
+			err := errors.New("Stdin is empty. Are you specifying the command in the wrong way?")
+			return nil, 0, err
+		}
+
+	default:
+		f, err := os.Open(path)
+		if err != nil {
+			return nil, 0, err
+		}
+		defer f.Close()
+		fi, err := f.Stat()
+		if err != nil {
+			return nil, 0, err
+		}
+
+		file = f
+		fileSize = fi.Size()
+	}
+
+	return file, fileSize, nil
 }
