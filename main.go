@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -20,6 +21,9 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
+	if err := validateFlags(*lineCount, *chunkCount, *byteCount); err != nil {
+		log.Fatalf("CLI error: %s", err)
+	}
 	path := flag.Arg(0)
 	prefix := flag.Arg(1)
 
@@ -65,13 +69,6 @@ func main() {
 		log.Fatal("File is nil")
 	}
 
-	if *lineCount != 1000 && *chunkCount != 0 || *chunkCount != 0 && *byteCount != 0 || *byteCount != 0 && *lineCount != 1000 {
-		log.Fatalln("Error: Options 'l', 'n', and 'b' cannot be specified simultaneously. Please choose only one.")
-	}
-	if *lineCount < 0 || *chunkCount < 0 || *byteCount < 0 {
-		log.Fatalln("Error: A negative value was entered. Please input a positive integer only.")
-	}
-
 	switch {
 	case *chunkCount != 0:
 		err := core.SplitToChunk(file, core.GenerateNextWriter(prefix), *chunkCount, int(fileSize))
@@ -92,4 +89,14 @@ func main() {
 			log.Fatalln(err)
 		}
 	}
+}
+
+func validateFlags(line, chunk, byte int) error {
+	if *lineCount != 1000 && *chunkCount != 0 || *chunkCount != 0 && *byteCount != 0 || *byteCount != 0 && *lineCount != 1000 {
+		return errors.New("Options 'l', 'n', and 'b' cannot be specified simultaneously. Please choose only one.")
+	}
+	if *lineCount < 0 || *chunkCount < 0 || *byteCount < 0 {
+		return errors.New("A negative value was entered. Please input a positive integer only.")
+	}
+	return nil
 }
