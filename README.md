@@ -1,4 +1,3 @@
-
 ## Daily Workflow
 
 ```
@@ -11,59 +10,60 @@ go build
 ```
 
 ## Feat
-- [ ] 複数ファイルに分割
+
+- [x] 複数ファイルに分割
 - [ ] 途中で失敗した場合、ファイルが復元されている？
-- [ ] prefixの数よりoutputファイル数が多い > split: too many files
-- [ ] inputファイルが読み込めない
+- [ ] suffix より output ファイル数が多い > split: too many files
+- [ ] input ファイルが読み込めない
   - [ ] タイムアウト
   - [ ] 破損
   - [ ] サイズが大きすぎる
   - [ ] サイズが大きすぎるかつ改行が存在しない
   - [ ] 存在しない
-- [ ] outputファイルが書き込めない
+- [ ] output ファイルが書き込めない
   - [ ] permission
   - [ ] volume not available
-  - [ ] inputファイルと同名
+  - [ ] input ファイルと同名
   - [ ] すでにファイルが存在する
-- [ ] inputの
+- [ ] input の
   - [x] 最終行の改行がない
-- [ ] outputの
-  - [ ] 改行がwindowsでは /r/n になっている
+- [ ] output の
+  - [ ] 改行が windows では /r/n になっている
 
 ## CLI
+
 - オプション [l, n, b]
   - l, lines=NUMBER: 出力ファイルごとの行数/レコード数を NUMBER/個にする
-  - n, number=CHUNKS: 作成する出力ファイルをCHUNKS個にする
+  - n, number=CHUNKS: 作成する出力ファイルを CHUNKS 個にする
     - N
-    - K/N N個中K番目を標準出力に出力する
-    - I/N N個のファイルに分割するが、行やレコード内の分割は行わない
+    - K/N N 個中 K 番目を標準出力に出力する
+    - I/N N 個のファイルに分割するが、行やレコード内の分割は行わない
     - r/N 'I'と同様だが、ラウンドロビン分割をする
-    - r/K/N 上記と同様だが、N個中K個を標準出力に出力する
-  - b, bytes=SIZE 出力サイズに含まれる行の最大サイズをSIZEにする
+    - r/K/N 上記と同様だが、N 個中 K 個を標準出力に出力する
+  - b, bytes=SIZE 出力サイズに含まれる行の最大サイズを SIZE にする
   - help
 - 引数の順 split [options] [file [prefix]]
 - パイプで渡された場合の処理方法をきめる
   - ファイルを読み取る必要がなかったりするかも
 
-
 ## Note
+
 - [ ] 文字数のカウントは何でやるの？
 - [ ] 日本語入力・マルチバイト文字 → 途中で分割したい？
-
 
 ## man split
 
 SYNOPSIS
-     split -d [-l line_count] [-a suffix_length] [file [prefix]]
-     split -d -b byte_count[K|k|M|m|G|g] [-a suffix_length] [file [prefix]]
-     split -d -n chunk_count [-a suffix_length] [file [prefix]]
-     split -d -p pattern [-a suffix_length] [file [prefix]]
+split -d [-l line_count] [-a suffix_length] [file [prefix]]
+split -d -b byte_count[K|k|M|m|G|g] [-a suffix_length] [file [prefix]]
+split -d -n chunk_count [-a suffix_length] [file [prefix]]
+split -d -p pattern [-a suffix_length] [file [prefix]]
 
 DESCRIPTION
-     The split utility reads the given file and breaks it up into files of
-     1000 lines each (if no options are specified), leaving the file
-     unchanged.  If file is a single dash (‘-’) or absent, split reads from
-     the standard input.
+The split utility reads the given file and breaks it up into files of
+1000 lines each (if no options are specified), leaving the file
+unchanged. If file is a single dash (‘-’) or absent, split reads from
+the standard input.
 
      The options are as follows:
 
@@ -104,8 +104,8 @@ DESCRIPTION
      If the prefix argument is not specified, the file is split into lexically
 
 EXAMPLES
-     Split input into as many files as needed, so that each file contains at
-     most 2 lines:
+Split input into as many files as needed, so that each file contains at
+most 2 lines:
 
            $ echo -e "first line\nsecond line\nthird line\nforth line" | split -l2
 
