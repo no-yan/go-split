@@ -1,11 +1,12 @@
-package core
+package core_test
 
 import (
-	"bufio"
 	"bytes"
 	"io"
 	"reflect"
 	"testing"
+
+	"github.com/no-yan/go-split/core"
 )
 
 func TestSplitByByte(t *testing.T) {
@@ -51,7 +52,7 @@ func TestSplitByByte(t *testing.T) {
 					Buffer: buf,
 				}
 			}
-			if err := SplitByByte(r, writerFunc, c.size); err != nil {
+			if err := core.SplitByByte(r, writerFunc, c.size); err != nil {
 				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, err)
 			}
 
@@ -119,7 +120,7 @@ func TestSplitByByteLargeInput(t *testing.T) {
 				}
 			}
 
-			if err := SplitByByte(r, writerFunc, c.size); err != nil {
+			if err := core.SplitByByte(r, writerFunc, c.size); err != nil {
 				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, err)
 			}
 
@@ -131,36 +132,6 @@ func TestSplitByByteLargeInput(t *testing.T) {
 				if buf.Len() != c.size && buf.Len() != c.in%c.size { // 最後のブロックは小さい可能性がある
 					t.Errorf("Expected buffer of size %d or %d, but got %d", c.size, c.in%c.size, buf.Len())
 				}
-			}
-		})
-	}
-}
-
-func TestCustomSplitFunc(t *testing.T) {
-	cases := []struct {
-		name string
-		in   string
-		want []string
-		size int
-	}{
-		{name: "empty input", in: "", want: []string{}, size: 5},
-		{name: "simple input", in: "hello\n", want: []string{"hello", "\n"}, size: 5},
-		{name: "no trailing newline", in: "Lacking EOF new line", want: []string{"Lacki", "ng EO", "F new", " line"}, size: 5},
-		{name: "multiple lines", in: "123456789\n123456789\n123456789\n123456789\n123456789\n",
-			want: []string{"12345", "6789\n", "12345", "6789\n", "12345", "6789\n", "12345", "6789\n", "12345", "6789\n"}, size: 5},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			r := bytes.NewReader([]byte(c.in))
-			got := make([]string, 0)
-			scanner := bufio.NewScanner(r)
-			scanner.Split(split(c.size))
-
-			for scanner.Scan() {
-				got = append(got, scanner.Text())
-			}
-			if !reflect.DeepEqual(got, c.want) {
-				t.Errorf("SplitByByte(%q)\n expected: %q\n got: %q", c.in, c.want, got)
 			}
 		})
 	}

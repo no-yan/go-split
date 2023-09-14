@@ -1,4 +1,4 @@
-package core
+package core_test
 
 import (
 	"bytes"
@@ -7,6 +7,8 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/no-yan/go-split/core"
 )
 
 func TestSplitToChunk(t *testing.T) {
@@ -48,7 +50,7 @@ func TestSplitToChunk(t *testing.T) {
 						Buffer: buf,
 					}
 				}
-				if err := SplitToChunk(r, writerFunc, c.chunk, len(c.in)); err != nil {
+				if err := core.SplitToChunk(r, writerFunc, c.chunk, len(c.in)); err != nil {
 					t.Errorf("SplitToChunk(%q)\n expected: %q\n got: %q", c.in, c.want, err)
 				}
 
@@ -116,7 +118,7 @@ func TestSplitToChunk(t *testing.T) {
 					}
 				}
 
-				err := SplitToChunk(r, writerFunc, c.chunk, c.in)
+				err := core.SplitToChunk(r, writerFunc, c.chunk, c.in)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)

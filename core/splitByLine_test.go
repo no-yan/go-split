@@ -1,10 +1,12 @@
-package core
+package core_test
 
 import (
 	"bytes"
 	"io"
 	"reflect"
 	"testing"
+
+	"github.com/no-yan/go-split/core"
 )
 
 func TestSplitByLine(t *testing.T) {
@@ -64,7 +66,7 @@ func TestSplitByLine(t *testing.T) {
 					Buffer: buf,
 				}
 			}
-			if err := SplitByLine(r, writerFunc, c.limit); err != nil {
+			if err := core.SplitByLine(r, writerFunc, c.limit); err != nil {
 				t.Errorf("SplitByLine(%q)\n expected: %q\n got: %q", c.in, c.want, err)
 			}
 
